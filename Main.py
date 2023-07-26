@@ -1,34 +1,34 @@
 import os
 import shutil
 import tkinter as tk
-from tkinter import ttk
+from tkinter import ttk, filedialog
 
-src = r"H:\moving"
-dst = r"F:\movehere"
+# OS
+# src = r"D:\moving"
+# dst = r"D:\movehere"
 
-extjpg = ".jpg"
-extpng = ".png"
+# extjpg = ".jpg"
+# extpng = ".png"
 
-for file in os.listdir(src):
-    if os.path.splitext(file) [-1] == extjpg or extpng:
-        shutil.move(os.path.join(src, file), dst)
+# for file in os.listdir(src):
+#     if os.path.splitext(file) [-1] == extjpg or extpng:
+#         shutil.move(os.path.join(src, file), dst)
+
+# TKinter
+def choose_folder():
+    source_path = filedialog.askdirectory()
+    print(source_path)
+
+    source_path_label = tk.Label(root, text = "Source folder: " + source_path, font = ("Arial", 12))
+    source_path_label.pack()
 
 root = tk.Tk()
 root.geometry("800x600")
 root.title("File Mover")
 
-label = tk.Label(root, text ="Move your files easily", font=("Arial", 18))
-label.pack(padx=25, pady=25)
-
-def on_dropdown_selected(event):
-    selected_item = dropdown_var.get()
-    print(f"Selected item: {selected_item}")
-
-dropdown_var = tk.StringVar()
-dropdown = ttk.Combobox(root, textvariable=dropdown_var, values=["Option 1", "Option 2", "Option 3"])
-dropdown.set("Select an option")
-
-dropdown.bind("<<ComboboxSelected>>", on_dropdown_selected)
-dropdown.pack()
+title_label = tk.Label(root, text = "Move your files easily", font = ("Arial", 18))
+title_label.pack(padx = 25, pady = 25)
+source_button = ttk.Button(root, text = "Select source folder", command = choose_folder)
+source_button.pack()
 
 root.mainloop()
