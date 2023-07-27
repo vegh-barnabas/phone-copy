@@ -3,18 +3,6 @@ import shutil
 import tkinter as tk
 from tkinter import ttk, filedialog
 
-# OS
-# src = r"D:\moving"
-# dst = r"D:\movehere"
-
-# extjpg = ".jpg"
-# extpng = ".png"
-
-# for file in os.listdir(src):
-#     if os.path.splitext(file) [-1] == extjpg or extpng:
-#         shutil.move(os.path.join(src, file), dst)
-
-# TKinter
 destination_path = None
 source_path = None
 
@@ -49,13 +37,44 @@ def enable_copy_button():
         copy_button = ttk.Button(root, text = "Copy files from source to destination", command = copy_files)
         copy_button.pack()
 
+def choose_filext():
+    global file_extension
+    global file_extension_dict
+    file_extension = None
+    file_type = file_type_var.get()
+
+    file_extension_dict = {
+        "JPG": ".jpg",
+        "JPEG": ".jpeg",
+        "MP4": ".mp4",
+        "MP3": ".mp3",
+        "PNG": ".png",
+        "Every picture": [".jpeg", ".jpg", ".png"],
+    }
+
+    file_extension = file_extension_dict.get(file_type, None)
+
+    if file_type == "Every picture":
+        file_extension = file_extension_dict["Every picture"]
+
+    if not file_extension:
+        output_text.inster(tk.END, "Invalid file type selection.\n")
+        return
+
 def copy_files():
     output_text.delete(1.0, tk.END)
+    choose_filext()
 
-    for file in os.listdir(source_path):
-        shutil.copy2(os.path.join(source_path, file), destination_path)
-        output_text.insert(tk.END, f"copied {file} to {destination_path} from {source_path}\n")
-
+    if file_extension == file_extension_dict["Every picture"]:
+        for file in os.listdir(source_path):
+            if os.path.splitext(file)[-1].lower() in file_extension:
+                shutil.copy2(os.path.join(source_path, file), destination_path)
+                output_text.insert(tk.END, f"Copied {file} to {destination_path} from {source_path}\n")
+    else:
+        for file in os.listdir(source_path):
+            if os.path.splitext(file)[-1].lower() == file_extension:
+                shutil.copy2(os.path.join(source_path, file), destination_path)
+                output_text.insert(tk.END, f"Copied {file} to {destination_path} from {source_path}\n")
     title_label.config(text = "Copy successful!")
 
 def swap_routes():
@@ -78,6 +97,10 @@ source_button = ttk.Button(root, text = "Select destination folder", command = c
 source_button.pack()
 destination_path_label = tk.Label(root, text = "No destination folder selected!", font = ("Arial", 12))
 destination_path_label.pack()
+file_type_var = tk.StringVar()
+file_type_var.set("Select file type")
+file_type_dropdown = ttk.Combobox(root, textvariable=file_type_var, values=["Select file type","Every picture", "JPG", "JPEG", "MP4","MP3", "PNG"])
+file_type_dropdown.pack()
 
 output_text = tk.Text(root, height=10, width=80)
 output_text.pack()
