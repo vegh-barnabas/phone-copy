@@ -71,14 +71,27 @@ def count_method(path, extensions):
 
     return count
 
+def list_files_with_size(directory_path):
+    file_list = os.listdir(directory_path)
+
+    files_with_size = []
+    for filename in file_list:
+        file_path = os.path.join(directory_path, filename)
+        file_size = os.path.getsize(file_path)
+        files_with_size.append([filename, file_size])
+
+    return files_with_size
+
+
 def copy_method(file_extension, source_path, destination_path):
     copied_files = 0
 
-    existing_files = os.listdir(destination_path)
+    files = list_files_with_size(source_path)
+    existing_files = list_files_with_size(destination_path)
 
-    for file in os.listdir(source_path):
+    for file, size in files:
         if os.path.splitext(file)[-1].lower() in file_extension:
-            if(file) not in existing_files:
+            if [file, size] not in existing_files:
                 shutil.copy2(os.path.join(source_path, file), destination_path)
                 output_text.insert(tk.END, f"Copied {file} to {destination_path} from {source_path}\n")
                 copied_files += 1
