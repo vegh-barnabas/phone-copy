@@ -60,22 +60,51 @@ def choose_filext():
     if not file_extension:
         output_text.inster(tk.END, "Invalid file type selection.\n")
         return
+    
+def count_method(path, extensions):
+    count = 0
+
+    for file in os.listdir(path):
+        for extension in extensions:
+            if(os.path.splitext(file)[-1].lower() == extension):
+                count += 1
+
+    return count
+
+def copy_method(file_extension, source_path, destination_path):
+    copied_files = 0
+
+    existing_files = os.listdir(destination_path)
+
+    for file in os.listdir(source_path):
+        if os.path.splitext(file)[-1].lower() in file_extension:
+            if(file) not in existing_files:
+                shutil.copy2(os.path.join(source_path, file), destination_path)
+                output_text.insert(tk.END, f"Copied {file} to {destination_path} from {source_path}\n")
+                copied_files += 1
+
+    return copied_files
+
+def convert_to_list(element):
+    if not isinstance(element, list):
+        element = [element]
+
+    return element
 
 def copy_files():
-    output_text.delete(1.0, tk.END)
+    global file_extension, source_path, destination_path
+
     choose_filext()
 
-    if file_extension == file_extension_dict["Every picture"]:
-        for file in os.listdir(source_path):
-            if os.path.splitext(file)[-1].lower() in file_extension:
-                shutil.copy2(os.path.join(source_path, file), destination_path)
-                output_text.insert(tk.END, f"Copied {file} to {destination_path} from {source_path}\n")
-    else:
-        for file in os.listdir(source_path):
-            if os.path.splitext(file)[-1].lower() == file_extension:
-                shutil.copy2(os.path.join(source_path, file), destination_path)
-                output_text.insert(tk.END, f"Copied {file} to {destination_path} from {source_path}\n")
-    title_label.config(text = "Copy successful!")
+    file_extension = convert_to_list(file_extension) # todo refactor
+
+    all_files = count_method(source_path, file_extension)
+
+    output_text.delete(1.0, tk.END)
+
+    copied_files = copy_method(file_extension, source_path, destination_path)
+
+    status_text.config(text = f"Copied {copied_files} files of {all_files}!")
 
 def swap_routes():
     global source_path, destination_path
@@ -104,5 +133,8 @@ file_type_dropdown.pack()
 
 output_text = tk.Text(root, height=10, width=80)
 output_text.pack()
+
+status_text = tk.Label(root, text = "Start moving files...", font = ("Arial", 12)) 
+status_text.pack()
 
 root.mainloop()
